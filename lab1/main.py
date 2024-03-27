@@ -1,7 +1,7 @@
-# multiply matrix by vector
 import copy
 
 
+# multiply matrix by vector
 def multiply_matrix_by_vector(matrix, vector):
     size = len(matrix)
     result_vector = []
@@ -16,7 +16,7 @@ def calculate_q_matrix(inverted_a, vector_x, index):
     try:
         coefficient = (-1) / vector_l[index]
     except ZeroDivisionError:
-        print('Matrix cannot be inverted.')
+        print('Матрица необратима.')
         return None
     vector_l[index] = -1
     vector_l = [value * coefficient for value in vector_l]
@@ -110,22 +110,35 @@ def print_matrix(matrix):
 
 
 def main():
-    test_files = ['tests/test1.txt', 'tests/test2.txt',
-                  'tests/test3.txt', 'tests/test4.txt',
-                  'tests/test5.txt', 'tests/test6.txt']
-    for file in test_files:
-        (matrix_a, inverted_matrix_a, vector_x, position) = read_from_file(file)
+    inverted_matrix_a = [
+        [1, 1, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+    ]
+    vector_x = [1, 0, 1]
+    position = 1
 
-        position -= 1
-        m = calculate_inverted_matrix(inverted_matrix_a, vector_x, position)
-        if m is not None:
-            print_matrix(m)
-            modified_matrix_a = copy.deepcopy(matrix_a)
-            for i in range(len(matrix_a)):
-                modified_matrix_a[i][position] = vector_x[i]
+    m = calculate_inverted_matrix(inverted_matrix_a, vector_x, position)
 
-            print(f'Test '
-                  f'{"passed" if test_inverted_matrix(m, modified_matrix_a) else "failed"}\n')
+    if m is not None:
+        print_matrix(m)
+
+    # test_files = ['tests/test1.txt', 'tests/test2.txt',
+    #               'tests/test3.txt', 'tests/test4.txt',
+    #               'tests/test5.txt', 'tests/test6.txt']
+    # for file in test_files:
+    #     (matrix_a, inverted_matrix_a, vector_x, position) = read_from_file(file)
+    #
+    #     position -= 1
+    #     m = calculate_inverted_matrix(inverted_matrix_a, vector_x, position)
+    #     if m is not None:
+    #         print_matrix(m)
+    #         modified_matrix_a = copy.deepcopy(matrix_a)
+    #         for i in range(len(matrix_a)):
+    #             modified_matrix_a[i][position] = vector_x[i]
+    #
+    #         print(f'Тест '
+    #               f'{"пройден успешно." if test_inverted_matrix(m, modified_matrix_a) else "не пройден."}\n')
 
 
 if __name__ == '__main__':

@@ -4,21 +4,20 @@ from invert_matrix import calculate_inverted_matrix
 
 # поиск оптимального плана симплекс-методом
 def simplex_method(a_matrix, b_basis_indexes, c, x):
-    print("A matrix\n", a_matrix)
-    print("basis indexes\t", b_basis_indexes)
-    print("c vector\t", c)
-    print("x vector\t", x)
+    print("c =", c)
+    print("A =\n", a_matrix)
+    print("Начальный базисный план: x =", x, "B =", b_basis_indexes)
 
     iteration = 1
     while iteration < 1000:
-        print("\nITERATION ", iteration)
+        # print("\nITERATION ", iteration)
         # построить матрицу a_b_matrix и найти обратную ей
         a_b_matrix = np.array([
             [
                 a_matrix[i][j] for j in b_basis_indexes
             ] for i in range(len(b_basis_indexes))
         ])
-        print("Ab matrix\n", str(a_b_matrix))
+        # print("Ab matrix\n", str(a_b_matrix))
         if iteration > 1:
             a_b_inv = np.array(calculate_inverted_matrix(prev_a_b_inv, a_matrix[:, j0], k))
             if a_b_inv is None:
@@ -30,36 +29,36 @@ def simplex_method(a_matrix, b_basis_indexes, c, x):
                 print("Матрица не обратима.")
                 return None
             prev_a_b_inv = a_b_inv
-        print("Ab inverse matrix\n", a_b_inv)
+        # print("Ab inverse matrix\n", a_b_inv)
 
         # построить вектор c_basis_vector
         c_basis_vector = np.array([c[i] for i in b_basis_indexes])
-        print("c_basis_vector\t", c_basis_vector)
+        # print("c_basis_vector\t", c_basis_vector)
 
         # найти вектор потенциалов potentials_vector
         potentials_vector = c_basis_vector.dot(a_b_inv)
-        print("potentials_vector\t", potentials_vector)
+        # print("potentials_vector\t", potentials_vector)
 
         # найти вектор оценок delta
         delta = potentials_vector.dot(a_matrix) - c
-        print("delta vector\t", delta)
+        # print("delta vector\t", delta)
 
         # проверить условие оптимальности
         if (delta >= 0).all():
             return x
 
-        # найти индекс первого отрицательного значения в векторе оценок j0
+        # найти индекс первого отрицательного значения в векторе оценок delta j0
         j0 = -1
         for i in range(len(delta)):
             if delta[i] < 0:
                 j0 = i
                 break
 
-        print("j0 = ", j0)
+        # print("j0 = ", j0)
 
         # найти вектор z
         z = a_b_inv.dot(a_matrix[:, j0])
-        print("z vector\t", z)
+        # print("z vector\t", z)
 
         # построить вектор theta и найти в нем минимальное значение
         theta = []
@@ -68,9 +67,9 @@ def simplex_method(a_matrix, b_basis_indexes, c, x):
                 theta.append(x[b_basis_indexes[i]] / z[i])
             else:
                 theta.append(np.Infinity)
-        print("theta vector\t", theta)
+        # print("theta vector\t", theta)
         theta_min = np.min(theta)
-        print("theta min = ", theta_min)
+        # print("theta min = ", theta_min)
 
         # проверить условие ограниченности целевой функции
         if theta_min == np.Infinity:
@@ -80,12 +79,12 @@ def simplex_method(a_matrix, b_basis_indexes, c, x):
         # найти первый индекс на котором достигается минимум theta j*
         k = np.argmin(theta)
         j_star = b_basis_indexes[k]
-        print("k = ", k)
-        print("j* = ", j_star)
+        # print("k = ", k)
+        # print("j* = ", j_star)
 
-        # в b заменить индекс j* на j0
+        # в b_basis_indexes заменить индекс j* на j0
         b_basis_indexes[k] = j0
-        print("b vector\t", b_basis_indexes)
+        # print("b vector\t", b_basis_indexes)
 
         # обновить компоненты плана
         x[j_star] = 0
@@ -94,7 +93,7 @@ def simplex_method(a_matrix, b_basis_indexes, c, x):
             x[b_basis_indexes[i]] -= theta_min * z[i]
 
         x[j0] = theta_min
-        print("x vector\t", x)
+        # print("x vector\t", x)
 
         iteration += 1
 
@@ -104,27 +103,27 @@ def simplex_method(a_matrix, b_basis_indexes, c, x):
 
 def main():
     # входные данные
-    # c = [1, 1, 0, 0, 0]
-    # a = np.array([
-    #         [-1, 1, 1, 0, 0],
-    #         [1, 0, 0, 1, 0],
-    #         [0, 1, 0, 0, 1]
-    #      ])
-    #
-    # # начальный базисный допустимый план
-    # b_basis_indexes = [2, 3, 4]
-    # x = [0, 0, 1, 3, 2]
-
-    c = [3, 5]
+    c = [1, 1, 0, 0, 0]
     a = np.array([
-        [-1, 1, 1, 0, 0, 1, 0, 0],
-        [1, 0, 0, 1, 0, 0, 1, 0],
-        [0, 1, 0, 0, 1, 0, 0, 1]
-    ])
+            [-1, 1, 1, 0, 0],
+            [1, 0, 0, 1, 0],
+            [0, 1, 0, 0, 1]
+         ])
 
     # начальный базисный допустимый план
-    b_basis_indexes = [5, 6, 7]
-    x = [0, 0, 0, 0, 0, 1, 3, 2]
+    b_basis_indexes = [2, 3, 4]
+    x = [0, 0, 1, 3, 2]
+
+    # c = [3, 5]
+    # a = np.array([
+    #     [-1, 1, 1, 0, 0, 1, 0, 0],
+    #     [1, 0, 0, 1, 0, 0, 1, 0],
+    #     [0, 1, 0, 0, 1, 0, 0, 1]
+    # ])
+    #
+    # # начальный базисный допустимый план
+    # b_basis_indexes = [5, 6, 7]
+    # x = [0, 0, 0, 0, 0, 1, 3, 2]
 
     # ------------------------------------
 
@@ -134,7 +133,7 @@ def main():
     # x = np.random.randint(-5, high=5, size=5)
 
     optimal_plan = simplex_method(a, b_basis_indexes, c, x)
-    print(optimal_plan)
+    print("Оптимальный план: x =", optimal_plan)
 
 
 if __name__ == '__main__':
