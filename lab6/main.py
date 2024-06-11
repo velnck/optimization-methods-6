@@ -56,13 +56,13 @@ def solve(A, c, D, basis_plan, basis, extended_basis):
             else:
                 theta[i] = np.Infinity
 
-        # находим минимальное значение theta_min и индекс theta_min_idx, на котором оно достигается
+        # находим минимальное значение theta_min и индекс j_star, на котором оно достигается
         theta_min = min(theta)
         if theta_j0 < theta_min:
             theta_min = theta_j0
-            theta_min_idx = j0
+            j_star = j0
         else:
-            theta_min_idx = np.argmin(theta)
+            j_star = np.argmin(theta)
         if theta_min == np.Infinity:
             print("Целевая функция задачи не ограничена снизу на множестве допустимых планов.")
             return None
@@ -71,25 +71,25 @@ def solve(A, c, D, basis_plan, basis, extended_basis):
         basis_plan = basis_plan + theta_min * l_vector
 
         # обновим опору ограничений basis и расширенную опору ограничений extended_basis
-        if theta_min_idx == j0:
-            extended_basis = np.concatenate([extended_basis, [theta_min_idx]])
-        elif theta_min_idx in extended_basis and theta_min_idx not in basis:
-            extended_basis = np.delete(extended_basis, np.where(extended_basis == theta_min_idx))
-        elif theta_min_idx in basis:
-            s = np.where(basis == theta_min_idx)[0][0]
+        if j_star == j0:
+            extended_basis = np.concatenate([extended_basis, [j_star]])
+        elif j_star in extended_basis and j_star not in basis:
+            extended_basis = np.delete(extended_basis, np.where(extended_basis == j_star))
+        elif j_star in basis:
+            s = np.where(basis == j_star)[0][0]
             all_zeros = True
             for j in extended_basis:
                 if j not in basis:
                     vect = np.dot(np.linalg.inv(A_basis), A[:, j])
                     if vect[s] != 0:
                         all_zeros = False
-                        # в опоре ограничений заменяем theta_min_idx на j
-                        basis[np.where(basis == theta_min_idx)[0][0]] = j
-                        extended_basis = np.delete(extended_basis, np.where(extended_basis == theta_min_idx))
+                        # в опоре ограничений заменяем j_star на j
+                        basis[np.where(basis == j_star)[0][0]] = j
+                        extended_basis = np.delete(extended_basis, np.where(extended_basis == j_star))
                         break
             if all_zeros:
-                basis[np.where(basis == theta_min_idx)[0][0]] = j0
-                extended_basis[np.where(extended_basis == theta_min_idx)[0][0]] = j0
+                basis[np.where(basis == j_star)[0][0]] = j0
+                extended_basis[np.where(extended_basis == j_star)[0][0]] = j0
 
 
 if __name__ == '__main__':
